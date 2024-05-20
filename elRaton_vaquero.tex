@@ -1,0 +1,113 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Proyecto Final de Lógica Computacional}
+\author{Mauricio Comas \\ Benjamin Martinez \\ Joaquin Medina}
+\date{09 de junio de 2024}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    En este proyecto, exploramos el uso de la programación lógica con PROLOG para resolver un problema específico. Se implementa el comportamiento de un ratón en una caja cuadriculada siguiendo reglas definidas y se investiga el concepto de programación lógica y su aplicación en problemas reales.
+\end{abstract}
+
+\section{Introducción}
+\label{sec:intro}
+La programación lógica es un paradigma de programación basado en la lógica formal. En este enfoque, los programas se describen en términos de relaciones lógicas y reglas en lugar de instrucciones secuenciales. PROLOG es el lenguaje de programación más comúnmente asociado con la programación lógica.
+
+\section{Objetivos}
+\label{sec:objetivos}
+\begin{itemize}
+    \item Familiarizarse con el lenguaje de programación PROLOG y el intérprete SWI-PROLOG.
+    \item Resolver un problema particular utilizando el enfoque de programación lógica.
+\end{itemize}
+
+\section{Programación Lógica}
+\label{sec:logica}
+\subsection{Definición}
+La programación lógica se basa en la lógica de predicados de primer orden y en el concepto de resolución de consultas lógicas. Es una herramienta poderosa en la representación del conocimiento y el razonamiento automatizado.
+
+\subsection{Aplicaciones}
+Un ejemplo destacado de la aplicación de la programación lógica es en el desarrollo de sistemas expertos, donde se utilizan reglas de inferencia para realizar consultas sobre bases de conocimiento.
+
+\section{Ejercicio 1: Investigación}
+\label{sec:ejercicio1}
+En esta sección se realiza una investigación sobre la programación lógica, describiendo una aplicación real citada en un artículo académico.
+
+\section{Ejercicio 2: Implementación en PROLOG}
+\label{sec:ejercicio2}
+El objetivo es implementar el comportamiento de un ratón en una caja cuadriculada. El ratón sigue ciertas reglas dependiendo del tipo de queso que encuentra y su estado.
+
+\subsection{Descripción del Problema}
+Se considera una caja rectangular de dimensiones \(N \times M\) con cuadrículas que pueden estar vacías o contener queso con veneno o ron. El ratón se mueve en la caja hasta encontrar la salida o morir.
+
+\subsection{Implementación}
+Aquí se describe el código en PROLOG que simula el comportamiento del ratón.
+
+\begin{lstlisting}[language=Prolog,caption=Implementación en PROLOG]
+% Definición de un tablero (ejemplo)
+board([
+    [empty, cheese(venom), empty],
+    [empty, cheese(rum), empty],
+    [exit, empty, cheese(rum)]
+]).
+
+% Regla para mover el ratón
+move(Mouse, Board, NewMouse) :-
+    Mouse = mouse(X, Y, Direction, Sober),
+    move_direction(X, Y, Direction, NewX, NewY),
+    within_bounds(NewX, NewY, Board),
+    handle_position(NewX, NewY, Sober, Board, NewMouse).
+
+% Regla para manejar la posición del ratón
+handle_position(X, Y, Sober, Board, NewMouse) :-
+    get_position(X, Y, Board, Position),
+    ( Position = exit -> NewMouse = mouse(X, Y, none, Sober);
+      Position = cheese(Type) -> handle_cheese(Type, Sober, X, Y, NewMouse)
+    ).
+
+% Regla para manejar el tipo de queso
+handle_cheese(venom, sober, X, Y, mouse(X, Y, dead, sober)) :- !.
+handle_cheese(rum, sober, X, Y, mouse(X, Y, random, drunk)) :- !.
+handle_cheese(_, sober, X, Y, mouse(X, Y, Direction, sober)) :- !.
+
+% Reglas auxiliares
+move_direction(X, Y, north, X, Y1) :- Y1 is Y - 1.
+move_direction(X, Y, south, X, Y1) :- Y1 is Y + 1.
+move_direction(X, Y, east, X1, Y) :- X1 is X + 1.
+move_direction(X, Y, west, X1, Y) :- X1 is X - 1.
+
+within_bounds(X, Y, Board) :-
+    length(Board, Rows),
+    nth0(0, Board, FirstRow),
+    length(FirstRow, Cols),
+    X >= 0, X < Cols,
+    Y >= 0, Y < Rows.
+
+get_position(X, Y, Board, Position) :-
+    nth0(Y, Board, Row),
+    nth0(X, Row, Position).
+\end{lstlisting}
+
+\subsection{Hallazgos y Desafíos}
+Durante la implementación, se encontraron varios desafíos, como la gestión de las reglas de movimiento y el manejo de estados del ratón (sobrio o borracho).
+
+\section{Conclusiones}
+\label{sec:conclusiones}
+El uso de la programación lógica con PROLOG permite modelar problemas complejos de manera declarativa. En este proyecto, se demostró cómo implementar un sistema de reglas para simular el comportamiento de un ratón en una caja cuadriculada.
+
+\section{Referencias}
+\label{sec:referencias}
+Asegúrate de incluir todas las referencias bibliográficas utilizadas en tu investigación y documentación.
+
+\end{document}
