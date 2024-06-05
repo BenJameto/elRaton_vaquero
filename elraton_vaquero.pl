@@ -36,7 +36,7 @@ direccion(arriba, 0, -1).
 direccion(abajo, 0, 1).
 
 % Posición inicial del ratón (X, Y, Dirección)
-raton(0, 2, abajo).
+raton(0, 2, derecha).
 
 % Movimiento del ratón en la misma dirección
 mover(X, Y, D, NX, NY) :-
@@ -88,23 +88,35 @@ girar_izquierda(izquierda, abajo).
 girar_izquierda(abajo, derecha).
 
 % Movimiento al chocar con una pared estando borracho
-chocar_pared_borracho(X, Y, D, X, Y, D).
+chocar_pared_borracho(X, Y, _, NX, NY, ND) :-
+    dimensiones(N, M),
+    (X =< 0; Y =< 0; X >= N; Y >= M),
+    random_between(1, 4, R),
+    random_direction(R, ND),
+    NX = X,
+    NY = Y.
 
 % Regla principal para mover el ratón
 mover_raton(X, Y, D, NX, NY, ND) :-
     (encontrar_queso(X, Y, D, NX, NY, ND);
-    encontrar_queso_con_ron(X, Y, D, NX, NY, ND);
-    (encontrar_queso_con_veneno(X, Y, D, muerto) -> NX = X, NY = Y, ND = muerto);
-    chocar_pared_sobrio(X, Y, D, NX, NY, ND);
-    chocar_pared_borracho(X, Y, D, NX, NY, ND)),
-    (celda(NX, NY, salida) -> ND = salida; true).
+     encontrar_queso_con_ron(X, Y, D, NX, NY, ND);
+     (encontrar_queso_con_veneno(X, Y, D, muerto) -> NX = X, NY = Y, ND = muerto);
+     chocar_pared_sobrio(X, Y, D, NX, NY, ND);
+     chocar_pared_borracho(X, Y, D, NX, NY, ND)),
+    (celda(NX, NY, salida) -> ND = salida; true),
+    \+ (ND = salida).
 
 % Inicio del programa
 inicio :-
     raton(X, Y, D),
     mover_raton(X, Y, D, NX, NY, ND),
-    (ND = muerto -> write('El ratón ha muerto.'), nl;
-    ND = salida -> write('El ratón ha encontrado la salida.'), nl;
-    write('Raton en: '), write(NX), write(','), write(NY), write(' dirección: '), write(ND), nl,
-    inicio).
+    (ND = muerto ->
+        write('El ratón ha muerto.'), nl
+    ; ND = salida ->
+        write('El ratón ha encontrado la salida.'), nl,
+        halt
+    ;
+        write('Raton en: '), write(NX), write(','), write(NY), write(' dirección: '), write(ND), nl,
+        inicio
+    ).
 
