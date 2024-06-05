@@ -1,10 +1,8 @@
 % Dimensiones de la caja (N, M)
-
-dimension(5,5).
-salida(4,3)
+dimensiones(5, 5).
+salida(4, 3).
 
 % Contenido de las celdas: vacío, queso, queso_con_ron, queso_con_veneno
-
 celda(0, 0, queso_con_veneno).
 celda(0, 1, queso).
 celda(0, 2, vacio).
@@ -32,17 +30,13 @@ celda(4, 3, salida).
 celda(4, 4, queso).
 
 % Direcciones
-
 direccion(derecha, 1, 0).
 direccion(izquierda, -1, 0).
 direccion(arriba, 0, -1).
 direccion(abajo, 0, 1).
 
 % Posición inicial del ratón (X, Y, Dirección)
-
-raton(0,0,derecha).
-
-% Movimientos del raton
+raton(0, 2, abajo).
 
 % Movimiento del ratón en la misma dirección
 mover(X, Y, D, NX, NY) :-
@@ -58,7 +52,7 @@ encontrar_queso(X, Y, D, NX, NY, D) :-
 % Movimiento al encontrar queso con ron
 encontrar_queso_con_ron(X, Y, _, NX, NY, ND) :-
     celda(X, Y, queso_con_ron),
-    random(1, 5, R),
+    random_between(1, 4, R),
     random_direction(R, ND),
     mover_7(X, Y, ND, NX, NY).
 
@@ -79,9 +73,11 @@ mover_7(X, Y, D, NX, NY) :-
     NX is X + 7 * DX,
     NY is Y + 7 * DY.
 
+
 % Movimiento al chocar con una pared estando sobrio
 chocar_pared_sobrio(X, Y, D, NX, NY, ND) :-
-    (X =< 0; Y =< 0; dimensiones(N, M), X > N; Y > M),
+    dimensiones(N, M),
+    (X =< 0; Y =< 0; X >= N; Y >= M),
     girar_izquierda(D, ND),
     mover(X, Y, ND, NX, NY).
 
@@ -96,14 +92,19 @@ chocar_pared_borracho(X, Y, D, X, Y, D).
 
 % Regla principal para mover el ratón
 mover_raton(X, Y, D, NX, NY, ND) :-
-    encontrar_queso(X, Y, D, NX, NY, ND);
+    (encontrar_queso(X, Y, D, NX, NY, ND);
     encontrar_queso_con_ron(X, Y, D, NX, NY, ND);
     (encontrar_queso_con_veneno(X, Y, D, muerto) -> NX = X, NY = Y, ND = muerto);
     chocar_pared_sobrio(X, Y, D, NX, NY, ND);
-    chocar_pared_borracho(X, Y, D, NX, NY, ND).
+    chocar_pared_borracho(X, Y, D, NX, NY, ND)),
+    (celda(NX, NY, salida) -> ND = salida; true).
 
 % Inicio del programa
-raton :-
+inicio :-
     raton(X, Y, D),
     mover_raton(X, Y, D, NX, NY, ND),
-    write('Raton en: '), write(NX), write(','), write(NY), write(' dirección: '), write(ND), nl.
+    (ND = muerto -> write('El ratón ha muerto.'), nl;
+    ND = salida -> write('El ratón ha encontrado la salida.'), nl;
+    write('Raton en: '), write(NX), write(','), write(NY), write(' dirección: '), write(ND), nl,
+    inicio).
+
