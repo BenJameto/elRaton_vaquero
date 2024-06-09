@@ -45,9 +45,10 @@ mover(X, Y, D, NX, NY) :-
     NY is Y + DY.
 
 % Movimiento al encontrar queso
-encontrar_queso(X, Y, D, NX, NY, D) :-
+encontrar_queso(X, Y, D, NX, NY, ND) :-
     celda(X, Y, queso),
-    mover(X, Y, D, NX, NY).
+    mover(X, Y, D, NX, NY),
+    ND = D.
 
 % Movimiento al encontrar queso con ron
 encontrar_queso_con_ron(X, Y, _, NX, NY, ND) :-
@@ -103,8 +104,7 @@ mover_raton(X, Y, D, NX, NY, ND) :-
      (encontrar_queso_con_veneno(X, Y, D, muerto) -> NX = X, NY = Y, ND = muerto);
      chocar_pared_sobrio(X, Y, D, NX, NY, ND);
      chocar_pared_borracho(X, Y, D, NX, NY, ND)),
-    (celda(NX, NY, salida) -> ND = salida; true),
-    \+ (ND = salida).
+    (celda(NX, NY, salida) -> ND = salida; true).
 
 % Inicio del programa
 inicio :-
