@@ -14,7 +14,7 @@
 
 ## El ratón vaquero
 
-  
+### El archivo oficial es **raton_mini.pl**
 
 ## Instrucciones
 
